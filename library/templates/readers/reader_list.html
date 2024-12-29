@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block title %}Reader List{% endblock %}
+
+{% block extra_css %}
+<style>
+    .reader-card {
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        cursor: pointer;
+    }
+
+    .reader-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .reader-card .reader-name {
+        font-size: 1.25rem;
+        font-weight: bold;
+    }
+
+
+
+
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h1>Readers</h1>
+    <div class="row">
+        {% for reader in readers %}
+        <div class="col-md-4">
+            {% if user.is_superuser %}
+            <!-- if admin -> Detail View is available -->
+            <a href="{% url 'reader-detail' reader.pk %}" class="text-decoration-none">
+                <div class="reader-card">
+                    <div class="reader-name">{{ reader.user.username }}</div>
+                </div>
+            </a>
+            {% else %}
+            <!-- If not admin -> detail_view card not clickable -->
+            <div class="reader-card">
+                <div class="reader-name">{{ reader.user.username }}</div>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

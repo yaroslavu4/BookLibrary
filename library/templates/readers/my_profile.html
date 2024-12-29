@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ reader.user.first_name }} {{ reader.user.last_name }} - Reader Details{% endblock %}
+
+{% block extra_css %}
+<style>
+    .reader-card {
+        border: 1px solid #ddd;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        margin-bottom: 20px;
+    }
+
+    .reader-card h3 {
+        color: #333;
+        margin-bottom: 15px;
+    }
+
+    .reader-details, .current-books, .reserved-books {
+        margin-bottom: 20px;
+    }
+
+    .profile-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .profile-container .col-md-4 {
+        flex: 1;
+    }
+
+    .reader-details {
+        flex: 2;
+    }
+
+    .current-books, .reserved-books {
+        flex: 1;
+    }
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="profile-container">
+        <!-- Reader Details Column -->
+        <div class="reader-details">
+            <div class="reader-card">
+                <h3>Profile Details</h3>
+                <p><strong>Name:</strong> {{ reader.user.first_name }} {{ reader.user.last_name }}</p>
+                <p><strong>Email:</strong> {{ reader.user.email }}</p>
+                <p><strong>Username:</strong> {{ reader.user.username }}</p>
+                <p><strong>Phone Number:</strong> {{ reader.phone_number }}</p>
+                <p><strong>Registration Date:</strong> {{ reader.created_at }}</p>
+            </div>
+        </div>
+
+        <!-- Books Currently Reading Column -->
+        <div class="current-books">
+            <div class="reader-card">
+                <h4>Books Currently Reading:</h4>
+                {% if loans %}
+                <ul>
+                    {% for loan in loans %}
+                    <li>
+                        {{ loan.book.title }} ({{ loan.book.author }})<br>
+                        To be returned by: <b><i>{{ loan.date_due|date:"Y-m-d" }}</i></b>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No books currently being read.</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Reserved Books Column -->
+        <div class="reserved-books">
+            <div class="reader-card">
+                <h4>Books Reserved:</h4>
+                {% if reservations %}
+                <ul>
+                    {% for reservation in reservations %}
+                    <li>
+                        {{ reservation.book.title }} ({{ reservation.book.author }})<br>
+                        Available from: <b><i>{{ reservation.date_available|date:"Y-m-d" }}</i></b>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No books reserved.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <a href="{% url 'reader-list' %}" class="btn btn-secondary">Back to List</a>
+</div>
+{% endblock %}
