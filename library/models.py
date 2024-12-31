@@ -34,7 +34,6 @@ class Loan(models.Model):
     date_due = models.DateTimeField(verbose_name="Date to be returned")
     date_returned = models.DateTimeField(blank=True, null=True, verbose_name="Date Returned")
 
-    # THINK HOW TO RESTRICT 2 USERS TO GET THE SAME BOOK
     def __str__(self):
         return f"{self.book.title} -> {self.reader.user.username}"
 
@@ -44,4 +43,3 @@ class Reservation(models.Model):
     reader = models.ForeignKey(Reader, on_delete=models.CASCADE, related_name="reservations")
     reserved_at = models.DateTimeField(auto_now_add=True)
     date_available = models.DateTimeField(null=True)
-    # IS_CLOSED = BOOL( reservation closed)

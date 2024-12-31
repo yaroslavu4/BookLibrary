@@ -75,6 +75,7 @@ class BookDetailView(LoginRequiredMixin, DetailView):
         return context
 
 
+# Could have done a Class with redefined "get" method but decides to stick to functional view
 def request_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
 
@@ -114,6 +115,7 @@ def request_book(request, pk):
     return redirect('book-detail', pk=book.pk)
 
 
+# Could have done a Class with redefined "post" method but decides to stick to functional view
 def add_book(request, pk):
     book = get_object_or_404(Book, pk=pk)
 
