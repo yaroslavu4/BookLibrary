@@ -2,30 +2,100 @@
 
 {% block title %}Register{% endblock %}
 
-{% block content %}
-<div class="container mt-5">
-    <h2>Create an Account</h2>
+{% block extra_css %}
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: auto;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .form-title {
+        margin-bottom: 20px;
+        font-weight: bold;
+        color: #333;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 10px;
+        margin-top: 5px;
+        border-radius: 5px;
+    }
+
+    .form-control:focus {
+        border-color: #007bff;
+        box-shadow: 0 0 4px rgba(0, 123, 255, 0.5);
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        width: 100%;
+        font-weight: normal;
+        margin-bottom: 5px;
+    }
+
+    .form-group input {
+        width: 100%;
+    }
+
+    .form-container .btn-primary {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .alert {
+        margin-top: 10px;
+    }
 
 
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-
-        <!-- Form Errors -->
-        {% if form.errors %}
-        <div class="alert alert-danger mt-3">
-            <ul>
-                {% for field, errors in form.errors.items %}
-                {% for error in errors %}
-                <li>{{ field|capfirst }}: {{ error }}</li>
-                {% endfor %}
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
-
-        <button type="submit" class="btn btn-primary mt-3">Register</button>
-    </form>
-</div>
+</style>
 {% endblock %}
 
+{% block content %}
+<div class="container mt-5">
+    <div class="form-container">
+        <h2 class="form-title text-center">Create an Account</h2>
+        <form method="POST">
+            {% csrf_token %}
+
+            <!-- Form Fields -->
+            {% for field in form %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                {{ field }}
+                {% if field.errors %}
+                <div class="text-danger small">
+                    {{ field.errors|join:", " }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <!-- Form Errors -->
+            {% if form.errors %}
+            <div class="alert alert-danger">
+                <ul>
+                    {% for field, errors in form.errors.items %}
+                    {% for error in errors %}
+                    <li>{{ field|capfirst }}: {{ error }}</li>
+                    {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            <button type="submit" class="btn btn-primary">Register</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

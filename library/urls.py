@@ -10,6 +10,7 @@ from .views import (
     ReaderDetailView,
     MyProfileView,
     register,
+    ReturnBookView,
 )
 
 urlpatterns = [
@@ -23,4 +24,5 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(next_page='book-list'), name='logout'),
     path('my-profile/', MyProfileView.as_view(), name='my-profile'),
     path('register/', register, name='register'),
+    path('return-book/<int:pk>/', ReturnBookView.as_view(), name='return-book'),
 ]

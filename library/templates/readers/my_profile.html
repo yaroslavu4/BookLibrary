@@ -39,8 +39,36 @@
         flex: 1;
     }
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 </style>
 {% endblock %}
+
+<!-- Flash Messages -->
+{% if messages %}
+<div class="container mt-3">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
 
 {% block content %}
 <div class="container">
@@ -67,6 +95,11 @@
                     <li>
                         {{ loan.book.title }} ({{ loan.book.author }})<br>
                         To be returned by: <b><i>{{ loan.date_due|date:"Y-m-d" }}</i></b>
+                        <!-- Return book button -->
+                        <form action="{% url 'return-book' loan.pk %}" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Return Book</button>
+                        </form>
                     </li>
                     {% endfor %}
                 </ul>
