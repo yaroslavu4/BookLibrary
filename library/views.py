@@ -37,46 +37,42 @@ class BookDetailView(LoginRequiredMixin, DetailView):
             messages.error(self.request, 'Please log in or register to view this book.')
         return response
 
+    def dispatch(self, request, *args, **kwargs):
+        # s there a reader for current user
+        try:
+            self.reader = Reader.objects.get(user=request.user)
+        except Reader.DoesNotExist:
+            messages.error(request, 'Please log in or register to view this book.')
+            return redirect('login')
+        return super().dispatch(request, *args, **kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        # get current reader
+        book = self.object
         user = self.request.user
 
-        try:
-            reader = Reader.objects.get(user=user)
-        except Reader.DoesNotExist:
-            messages.error(self.request, 'Please log in or register to view this book.')
-            return redirect('login')
+        # Reservation for the book?
+        already_requested = book.reservations.filter(reader=self.reader).exists()
+        context['already_requested'] = already_requested
+
+        # Loan for the book?
+        active_loan = Loan.objects.filter(
+            book=self.object,
+            reader=self.reader,
+            date_returned__isnull=True
+        ).exists()
+
+        # Book status
+        if active_loan:
+            context['book_status'] = 'In Use'
+        elif book.is_active:
+            context['book_status'] = 'Available'
         else:
-            book = self.object
+            context['book_status'] = 'Not Available'
 
-            # check if reader has already requested the book
-            already_requested = book.reservations.filter(reader__user=reader.user).exists()
-            context['already_requested'] = already_requested
-
-            # check if reader has already added the book
-            active_loan = Loan.objects.filter(
-                book=self.object,
-                reader=user.reader,
-                date_returned__isnull=True  # check that book is not returned yet
-            ).exists()
-
-            # Book status
-            if active_loan:
-                context['book_status'] = 'In Use'  # in use by current reader
-            elif book.is_active:
-                context['book_status'] = 'Available'
-            else:
-                context['book_status'] = 'Not Available'
-
-            context['active_loan'] = active_loan
-            return context
-
-
-# class LoanCreateView(CreateView):
-#     model = Loan
-#     success_url = reverse_lazy('hr:employee_list')
+        context['active_loan'] = active_loan
+        return context
 
 
 def request_book(request, pk):
