@@ -1,7 +1,11 @@
 from datetime import timedelta
 
+from django.urls import reverse
+from django.views import generic
+
 from django.contrib import messages
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from django.utils.timezone import now
@@ -216,3 +220,46 @@ def register(request):
     else:
         form = CustomUserCreationForm()
     return render(request, 'registration/register.html', {'form': form})
+
+
+class ReturnBookView(generic.View):
+    def post(self, request, pk):
+        loan = get_object_or_404(Loan, pk=pk)
+
+        if loan.reader.user != request.user:
+            raise Http404("You cannot return this book.")
+
+        # All reservations
+        reservations = Reservation.objects.filter(book=loan.book).order_by('reserved_at').exists()
+
+        # There is a waitlist for this book
+        if reservations:
+            # Get first one
+            reservation = reservations.first()
+
+            # new loan
+            Loan.objects.create(
+                book=loan.book,
+                reader=reservation.reader,
+                date_due=timezone.now() + LoanPeriod.STANDARD.duration,
+            )
+
+            # Delete that reservation
+            reservation.delete()
+
+            message = f'Your book "{loan.book.title}" has been successfully returned and assigned to {reservation.reader.user.username}.'
+
+        # No waitlist for this book
+        else:
+            loan.date_returned = timezone.now()
+            loan.save()
+
+            # Book becomes available
+            loan.book.is_active = True
+            loan.book.save()
+
+            message = f'Your book "{loan.book.title}" has been successfully returned and is now available for others.'
+
+        # messages.success(request, message)
+        # for unknow reason message pops up on 'book-detail' view, so I hid it for now
+        return redirect(reverse('my-profile'))
