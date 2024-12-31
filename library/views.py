@@ -247,6 +247,9 @@ class ReturnBookView(generic.View):
             # Delete that reservation
             reservation.delete()
 
+            # reservation exists, previous loan no longer relevant, close it
+            loan.delete()
+            
             message = f'Your book "{loan.book.title}" has been successfully returned and assigned to {reservation.reader.user.username}.'
 
         # No waitlist for this book
