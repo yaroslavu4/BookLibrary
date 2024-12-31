@@ -230,10 +230,10 @@ class ReturnBookView(generic.View):
             raise Http404("You cannot return this book.")
 
         # All reservations
-        reservations = Reservation.objects.filter(book=loan.book).order_by('reserved_at').exists()
+        reservations = Reservation.objects.filter(book=loan.book).order_by('reserved_at')
 
         # There is a waitlist for this book
-        if reservations:
+        if reservations.exists():
             # Get first one
             reservation = reservations.first()
 
