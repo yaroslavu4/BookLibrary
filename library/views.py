@@ -38,10 +38,10 @@ class BookDetailView(LoginRequiredMixin, DetailView):
         return response
 
     def dispatch(self, request, *args, **kwargs):
-        # s there a reader for current user
+        # Is there a reader for current user
         try:
-            self.reader = Reader.objects.get(user=request.user)
-        except Reader.DoesNotExist:
+            self.reader = get_object_or_404(Reader, user=request.user)
+        except Exception:
             messages.error(request, 'Please log in or register to view this book.')
             return redirect('login')
         return super().dispatch(request, *args, **kwargs)
